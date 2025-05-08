@@ -23,6 +23,7 @@ library(ggplot2)
 library(gapminder)
 library(magrittr) #algunos los vuelvo a llamar por error al correr el script
 library(tidyselect)
+library(purrr)
 library(readr)
 library(rio)
 library(xlsx)
@@ -167,6 +168,8 @@ journal.select %>%
   mutate(language = reorder(language, n)) %>%
   ggplot(aes(x = reorder(language, n), y = n, fill = language)) +
   geom_col () + # si agrego , fill = "blue" cambio color
+  #scale_fill_manual(values = rainbow(length(unique(datos$language)))) +
+  scale_fill_viridis_d(option = "C" ) +
   theme_minimal() +
   theme(legend.position = "n") +
   ylab("Número de veces que aparecen") +
@@ -181,12 +184,13 @@ journal.select %>%
   count() %>%
   filter(n >= 50 & n <= 750) %>%
   mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, n), y = n, fill = country)) +  # Mapear 'country' al color
+  ggplot(aes(x = language, y = n, fill = country)) +  # Mapear 'country' al color
   geom_col() +
   theme_minimal() + # Colocar la leyenda en la parte superior
+  theme(legend.position = "none") +
   ylab("Número de veces que aparecen") +
   xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
+  ggtitle("Idiomas de publicación por países") +
   coord_flip()
 
 # por continente 
@@ -195,18 +199,20 @@ install.packages("countrycode")
 
 # Cargar las librerías 
 library(countrycode)
-
+library(ggplot2)
+library(dplyr)
+library(viridis)
 # 
 journal.select <- journal.select %>%
   mutate(continent = countrycode(country, "country.name", "continent"))
 
-# Ahora puedes usar el continente en tu gráfico
+# Por continente
 journal.select %>%
   group_by(language, country, continent) %>%
   count() %>%
-  filter(n >= 150 ) %>%
+  filter(n >= 100 ) %>%
   mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, n), y = n, fill = country)) +  
+  ggplot(aes(x = language, y = n, fill = country)) +  
   geom_col(show.legend = FALSE) +  
   #geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +
   theme_minimal() +
@@ -215,7 +221,7 @@ journal.select %>%
   ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
   coord_flip() +
   facet_wrap(~ continent) +  # Usar facetas por continente
-  #scale_fill_brewer(palette = "Paired") +  # Usar una paleta con más colores
+  scale_fill_viridis_d(option = "H") +  # Usar una paleta con más colores
   theme(
     plot.title = element_text(hjust = 0.5, size = 16),
     axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
@@ -223,8 +229,36 @@ journal.select %>%
     axis.title.y = element_text(size = 12),
     plot.margin = margin(10, 10, 10, 10)
   )
-ggsave("idiomas-continente_min150.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave("idiomas-continente_min100.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 class(journal.select)
+
+
+journal.select %>%
+  group_by(language, country, continent) %>%
+  count() %>%
+  filter(n >= 25 & n<= 150) %>%
+  mutate(language = reorder(language, n)) %>%
+  ggplot(aes(x = language, y = n, fill = country)) +  
+  geom_col(show.legend = FALSE) +  # Eliminamos la leyenda de los países
+  #geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +  
+  theme_minimal() +
+  ylab("Número de publicaciones") +
+  xlab(NULL) +
+  ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
+  coord_flip() +
+  facet_wrap(~ continent, scales = "free_y") +  # Ajusta las escalas de cada faceta por continente
+  scale_fill_viridis_d(option = "H") +  # Paleta viridis con más colores, ajustada para una mejor visualización
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 1),  # Ajusta la rotación para los textos en el eje X
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
+    plot.margin = margin(10, 10, 10, 10),
+    strip.text = element_text(size = 10),  # Títulos de las facetas más grandes
+    strip.background = element_rect(fill = "lightgray")  # Fondo gris claro para las facetas
+  )
+ggsave("idiomas-cont_min25_mx150.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+
 
 ##AMERICA LATINA
 
@@ -304,27 +338,46 @@ ggsave("idiomas-amlat.jpg", width = 3000, height = 1500, units = "px", dpi = 300
 english <- journal.amlat[journal.amlat$language == "English", ]
 colnames(english)
 
+install.packages("scico")
+library(scico)
+install.packages("Cairo")
+library(Cairo)
+
 # Crear el gráfico de dispersión con etiquetas de conteo
-ggplot(journal.amlat %>% 
+plot1 <- ggplot(journal.amlat %>% 
          group_by(language, country, Subjects) %>% 
          summarise(count = n()) %>% 
          filter(count >= 3 ) %>% 
          mutate(language = reorder(language, count)), 
        aes(x = country, y = language, color = Subjects)) +
-  geom_point(size = 5) +
+  geom_point(size = 5, alpha = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(
+    plot.title = element_text(hjust = 1 , size = 16),  # Espacio bajo el título
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "left",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    legend.spacing.y = unit(0.1, "cm"),  # Espacio entre filas de leyenda
+    plot.margin = margin(t = 20, r = 20, b = 20, l = 80)
+  ) +
+  guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
   ylab("Idiomas") +
   xlab("Países") +
   ggtitle("Relación entre países, idiomas y áreas en publicaciones de América Latina") +
-  scale_color_viridis(discrete = TRUE, option = "viridis")  # Utilizar una paleta de colores como Viridis
-ggsave("relacion_idiomas_areas-amlat.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+  scale_color_scico_d(palette = "berlin")  # También probá: "lajolla", "tokyo", "batlow"
+  #scale_color_viridis_d(option = "D")  # Utilizar una paleta de colores como Viridis
+ggsave("relacion_idiomas_temas-amlat.jpg",
+       plot = plot1,
+       width = 3800, height = 1900, units = "px", dpi = 300)
+
 
 library(viridis)
 
 ggplot(english, aes(x = country, fill = Subjects)) +
   geom_bar(position = "stack") +
-  scale_fill_viridis(discrete = TRUE) +  # Usar la paleta viridis
+  scale_fill_viridis_d(option = "D") +  # Usar la paleta viridis
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   ylab("Número de registros") +
@@ -335,56 +388,65 @@ ggplot(english, aes(x = country, fill = Subjects)) +
 journal.amlat %>%
   group_by(Publisher)%>%
   count()%>%
-  filter(n>10)%>%
-  mutate(Publisher = reorder(Publisher, -n)) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) +  # Ordenar x según la frecuencia -n
+  filter(n>12)%>%
+  mutate(Publisher = reorder(Publisher, n)) %>%
+  ggplot(aes(x = reorder(Publisher, n), y = n, fill = Publisher)) +  # Ordenar x según la frecuencia -n
   geom_col () + # si agrego , fill = "blue" cambio color
   theme_minimal() +
   theme(legend.position = "n") +
+  scale_color_scico_d(palette = "bilbao") +
   ylab("Cantidad de revistas publicadas por") +
   xlab(NULL) +
   ggtitle("Editorial de publicación de revistas en América Latina") +
   coord_flip()
-ggsave("editorial_América Latina.png", width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave("editorial_América Latina_min12.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=2)%>%
+  group_by(license) %>%
+  count() %>%
+  filter(n >= 5) %>%
   mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
+  ggplot(aes(x = reorder(license, n), y = n, fill = license)) +
+  geom_col() +
+  scale_fill_scico_d(palette = "berlin") +
   theme_minimal() +
-  theme(legend.position = "n") +
+  theme(legend.position = "none") +  # debe ser "none", no "n"
   ylab("Tipo de licencias") +
   xlab(NULL) +
   ggtitle("Licencias de publicación de revistas en América Latina") +
   coord_flip()
-ggsave("licencia_América Latina.png", width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave("licencia_AmLatina_min5.png", width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
   group_by(Review)%>%
   count()%>%
-  filter(n>=7)%>%
+  filter(n>=10)%>%
   mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
+  ggplot(aes(x = reorder(Review, n), y = n, fill = Review)) +
   geom_col () + # si agrego , fill = "blue" cambio color
+  scale_fill_scico_d(palette = "berlin") +
   theme_minimal() +
   theme(legend.position = "n") +
   ylab("Proceso de revisión") +
   xlab(NULL) +
   ggtitle("Proceso de revisión de publicación de revistas en América Latina") +
+  scale_color_scico_d(palette = "lajolla") +
   coord_flip()
-ggsave("revision_América Latina.png", width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave("revision_AmLatina_min10.png", width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
+  group_by(Subjects) %>%
+  count() %>%
+  filter(n > 15) %>%
+  mutate(Subjects = fct_reorder(Subjects, n)) %>%
+  ggplot(aes(x = reorder(Subjects, n), y = n, fill = Subjects)) +
+  geom_col() +
   theme_minimal() +
   theme(legend.position = "none") +
   ylab("Frecuencia") +
   xlab("Temas") +
   ggtitle("Temas de publicación de revistas en América Latina") +
+  scale_fill_scico_d(palette = "lajolla") +
   coord_flip()
 ggsave("temas_América Latina.png", width = 3000, height = 1500, units = "px", dpi = 300)
 
@@ -509,7 +571,9 @@ analizar_pais <- function(pais, data = journal.amlat) {
   guardar_grafico(g6, "identificadores_", pais)
 }
 
-
+walk(selected_countries, analizar_pais)
+ 
+selected_countries
 analizar_pais("Colombia")
 
 
