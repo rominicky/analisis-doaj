@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Si usás este repositorio, por favor citá como se indica a continuación."
+title: "Análisis de revistas latinoamericanas en DOAJ"
+authors:
+  - name: Romina De León
+    orcid: "https://orcid.org/0000-0003-2495-7213"  # Opcional, reemplazá si tenés uno
+    affiliation: "CONICET"
+date-released: 2025-05-13
+version: "1.0.0"
+doi: 10.5281/zenodo.1234567  # Reemplazá con el DOI real de Zenodo
+url: "https://github.com/rominicky/analisis-doaj"
+repository-code: "https://github.com/rominicky/analisis-doaj"
+license: "CC BY-NC-SA 4.0"  # Reemplazá si usás otra (por ejemplo: CC-BY-4.0)
+keywords:
+  - acceso abierto
+  - DOAJ
+  - revistas científicas
+  - América Latina
+  - visualización de datos

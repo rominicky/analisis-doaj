@@ -6,7 +6,7 @@ getwd()
 path_wd <- getwd()
 #
 
-setwd(path_wd)
+setwd("E:/hd-git/analisis-doaj/assets/img/visualizaciones/2025")
 packages <- c("tidytext", "gapminder", "tidyverse", "dplyr", "ggplot2")
 install.packages(packages, INSTALL_opts = '--no-lock') #si tira error de /00LOCK 
 #lo eliminé C:\Users\RominaSoledadDeLeon\AppData\Local\R\win-library desde esa carpeta busque folder /00LOCK 
@@ -36,7 +36,7 @@ library(htmlwidgets)
 #Gimena quiere que se haga una jupyter para levantar en vivo y generar los gráficos
 
 #journal <- read.csv(url("https://raw.githubusercontent.com/rominicky/analisis-doaj/main/journalcsv__doaj_20240404_1721_utf8.csv?token=GHSAT0AAAAAACPRMIVAKVUR2TLJYTL5B4QOZQVK33A"))
-journal <- read.csv("2025_journalcsv.csv")
+journal <- read.csv("E:/hd-git/analisis-doaj/2025_journalcsv.csv")
 as_tibble(journal)
 #nueva tabla con datos de interes 
 
@@ -137,25 +137,42 @@ paises_total <- hchart(
     y = 10,  # Ajustar la posición vertical de la leyenda
     itemStyle = list(fontSize = "12px", fontWeight = "normal"),
     labelFormat = "{name}: {percentage:.1f}%"
+  )%>%
+  hc_credits(
+    enabled = TRUE,  # Habilitar los créditos
+    text = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.",  # Tu cita
+    href = "https://github.com/rominicky/analisis-doaj"  # Enlace a tu repositorio, si lo deseas
   )
 saveWidget(paises_total, file = "paises_total-interactivo_amlat_2024.html")
 
-p <- ggplot(filtered_data, aes(x = "", y = percentage, fill = country)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y", start = 0) +
-  labs(title = "Porcentaje de países América Latina",
-       fill = "País",
-       x = NULL,
-       y = NULL) +
-  theme_void() +
-  scale_fill_discrete(name = "Países",
-                      labels = function(x) {
-                        index <- match(x, filtered_data$country)
-                        paste(x, round(filtered_data$percentage[index], 2), "%", sep = "\n")
-                      }) +
-  theme(legend.position = "right")
-p + theme(plot.title=element_text(size=25, face='bold', color='purple'))
-ggsave("paises-total.png", width = 3000, height = 1500, units = "px", dpi = 300)
+# p <- ggplot(filtered_data, aes(x = "", y = percentage, fill = country)) +
+#   geom_bar(stat = "identity", width = 1) +
+#   coord_polar("y", start = 0) +
+#   labs(
+#     title = "Porcentaje de países América Latina",
+#     fill = "País",
+#     caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.",
+#     x = NULL,
+#     y = NULL
+#   ) +
+#   theme_void() +
+#   scale_fill_discrete(
+#     name = "Países",
+#     labels = function(x) {
+#       index <- match(x, filtered_data$country)
+#       paste(x, round(filtered_data$percentage[index], 2), "%", sep = "\n")
+#     }
+#   ) +
+#   theme(
+#     legend.position = "left",
+#     plot.caption = element_text(hjust = 0, face = "italic", size = 10),
+#     plot.margin = unit(c(0, 0, 1, 0), "cm")
+#     
+#   ) +
+#   guides(fill = guide_legend(ncolumn = 2)) 
+# 
+# # Guardar con dimensiones grandes
+# ggsave("paises-total.jpg", plot = p, width = 3000, height = 1500, units = "px", dpi = 300)
 
 total.journal <- length(journal.select$title)
 total.journal
@@ -175,23 +192,54 @@ journal.select %>%
   ylab("Número de veces que aparecen") +
   xlab(NULL) +
   ggtitle("Idiomas de publicación de revistas en todo el mundo") +
-  coord_flip()
-ggsave("idiomas-total.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+
+ggsave("idiomas-total_min100-2024.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 
 #idioma por pais
 journal.select %>%
-  group_by(language, country) %>%
+  group_by(country, language) %>%
   count() %>%
+  ungroup() %>%
   filter(n >= 50 & n <= 750) %>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = language, y = n, fill = country)) +  # Mapear 'country' al color
+  #mutate(language = reorder(language, n)) %>%  # idiomas por frecuencia
+  ggplot(aes(x = reorder(language, n), y = n, fill = country)) +  # n como valor numérico
   geom_col() +
-  theme_minimal() + # Colocar la leyenda en la parte superior
-  theme(legend.position = "none") +
-  ylab("Número de veces que aparecen") +
+  coord_flip() +
+  theme_minimal() + 
+  theme(legend.position = "n"
+    #plot.caption = element_text(hjust = 0, face = "italic", size = 9),
+    #plot.margin = unit(c(1, 1, 2, 1), "cm")
+  ) +
+  ylab("Número de publicaciones") +
+  #xlab(NULL) +
+  ggtitle("Publicaciones por idioma y país") +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+ggsave("publ_paises-idiomas-total_min50-mx750-2024.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+
+journal.select %>%
+  group_by(country, language) %>%
+  count() %>%
+  ungroup() %>%
+  filter(n >= 50 & n <= 5500) %>%
+  mutate(country = reorder_within(country, n, language)) %>%  # para que ordene dentro de cada panel
+  ggplot(aes(x = country, y = n, fill = country)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ language, scales = "free_y") +  # un panel por idioma
+  scale_x_reordered() +  # necesario con reorder_within
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic", size = 9),
+    strip.text = element_text(size = 10, face = "bold")
+  ) +
   xlab(NULL) +
-  ggtitle("Idiomas de publicación por países") +
-  coord_flip()
+  ylab("Número de publicaciones") +
+  ggtitle("Publicaciones por país en cada idioma") +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+
+
 
 # por continente 
 # Instalar la librería si no está instalada
@@ -218,8 +266,9 @@ journal.select %>%
   theme_minimal() +
   ylab("Número de publicaciones") +
   xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
+  ggtitle("Idiomas de publicación en todo el mundo diferenciado por países") +
   coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
   facet_wrap(~ continent) +  # Usar facetas por continente
   scale_fill_viridis_d(option = "H") +  # Usar una paleta con más colores
   theme(
@@ -232,32 +281,33 @@ journal.select %>%
 ggsave("idiomas-continente_min100.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 class(journal.select)
 
-
-journal.select %>%
-  group_by(language, country, continent) %>%
-  count() %>%
-  filter(n >= 25 & n<= 150) %>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = language, y = n, fill = country)) +  
-  geom_col(show.legend = FALSE) +  # Eliminamos la leyenda de los países
-  #geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +  
-  theme_minimal() +
-  ylab("Número de publicaciones") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
-  coord_flip() +
-  facet_wrap(~ continent, scales = "free_y") +  # Ajusta las escalas de cada faceta por continente
-  scale_fill_viridis_d(option = "H") +  # Paleta viridis con más colores, ajustada para una mejor visualización
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16),
-    axis.text.x = element_text(size = 10, angle = 45, hjust = 1),  # Ajusta la rotación para los textos en el eje X
-    axis.text.y = element_text(size = 10),
-    axis.title.y = element_text(size = 10),
-    plot.margin = margin(10, 10, 10, 10),
-    strip.text = element_text(size = 10),  # Títulos de las facetas más grandes
-    strip.background = element_rect(fill = "lightgray")  # Fondo gris claro para las facetas
-  )
-ggsave("idiomas-cont_min25_mx150.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+#similar con botones
+# journal.select %>%
+#   group_by(language, country, continent) %>%
+#   count() %>%
+#   filter(n >= 25 & n<= 150) %>%
+#   mutate(language = reorder(language, n)) %>%
+#   ggplot(aes(x = language, y = n, fill = country)) +  
+#   geom_col(show.legend = FALSE) +  # Eliminamos la leyenda de los países
+#   #geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +  
+#   theme_minimal() +
+#   ylab("Número de publicaciones") +
+#   xlab(NULL) +
+#   ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
+#   coord_flip() +
+#   labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+#   facet_wrap(~ continent, scales = "free_y") +  # Ajusta las escalas de cada faceta por continente
+#   scale_fill_viridis_d(option = "H") +  # Paleta viridis con más colores, ajustada para una mejor visualización
+#   theme(
+#     plot.title = element_text(hjust = 0.5, size = 16),
+#     axis.text.x = element_text(size = 10, angle = 45, hjust = 1),  # Ajusta la rotación para los textos en el eje X
+#     axis.text.y = element_text(size = 10),
+#     axis.title.y = element_text(size = 10),
+#     plot.margin = margin(10, 10, 10, 10),
+#     strip.text = element_text(size = 10),  # Títulos de las facetas más grandes
+#     strip.background = element_rect(fill = "lightgray")  # Fondo gris claro para las facetas
+#   )
+#ggsave("idiomas-cont_min25_mx150.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 
 
 ##AMERICA LATINA
@@ -280,14 +330,16 @@ journal.amlat %>%
   count() %>%
   filter(n >= 1) %>%
   mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
+  ggplot(aes(x = reorder(language, n), y = n, fill = language)) +
   geom_col() +
   theme_minimal() +
-  theme(legend.position = "none") +  # Cambié "n" a "none" para ocultar la leyenda
+  theme(legend.position = "n") +  # Cambié "n" a "none" para ocultar la leyenda
+  scale_fill_viridis_d(option = "G") +
   ylab("Número de veces que aparecen") +
   xlab(NULL) +
-  ggtitle("Idiomas de publicaciones sobre Historia en América Latina") +
-  coord_flip()
+  ggtitle("Idiomas de publicaciones sobre 'Social Sciences' en América Latina") +
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave("area_social_sciences_idioma_AmLatina.png", width = 3000, height = 1500, units = "px", dpi = 300)
 
 
@@ -300,11 +352,13 @@ journal.amlat %>%
   ggplot(aes(x = reorder(language, n), y = n, fill = language)) +
   geom_col() +
   theme_minimal() +
-  theme(legend.position = "none") +  # Cambié "n" a "none" para ocultar la leyenda
+  theme(legend.position = "n") +  # Cambié "n" a "none" para ocultar la leyenda
+  scale_fill_viridis_d(option = "G") +
   ylab("Número de veces que aparecen") +
   xlab(NULL) +
   ggtitle("Idiomas de publicaciones sobre Ciencias Sociales y Humanidades en América Latina") +
-  coord_flip()  
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")  
 ggsave("area_cssoc_idioma_AmLatina.png", width = 3000, height = 1500, units = "px", dpi = 300)  
   
 #############################################################
@@ -313,7 +367,7 @@ ggsave("area_cssoc_idioma_AmLatina.png", width = 3000, height = 1500, units = "p
 journal.amlat %>%
   group_by(language, country) %>%
   count() %>%
-  filter(n >= 25) %>%
+  filter(n >= 10) %>%
   mutate(language = reorder(language, n)) %>%
   ggplot(aes(x = language, y = n, fill = country)) +
   geom_col() +
@@ -330,32 +384,34 @@ journal.amlat %>%
   xlab("Idioma") +
   ggtitle(
     "Distribución de idiomas en publicaciones académicas de América Latina",
-    subtitle = "Solo se muestran combinaciones con al menos 25 registros"
+    subtitle = "Solo se muestran combinaciones con al menos 10 registros"
   ) +
-  coord_flip()
-ggsave("idiomas-amlat.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+ggsave("idiomas-amlat_min10.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 
 english <- journal.amlat[journal.amlat$language == "English", ]
 colnames(english)
 
 install.packages("scico")
+
 library(scico)
 install.packages("Cairo")
 library(Cairo)
 
 # Crear el gráfico de dispersión con etiquetas de conteo
-plot1 <- ggplot(journal.amlat %>% 
+ggplot(journal.amlat %>% 
          group_by(language, country, Subjects) %>% 
          summarise(count = n()) %>% 
-         filter(count >= 3 ) %>% 
+         filter(count >= 4 ) %>% 
          mutate(language = reorder(language, count)), 
        aes(x = country, y = language, color = Subjects)) +
   geom_point(size = 5, alpha = 0.7) +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 1 , size = 16),  # Espacio bajo el título
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "left",
+    axis.text.x = element_text(angle = 60, hjust = 1),
+    legend.position = "right",
     legend.box = "horizontal",
     legend.title = element_text(size = 7),
     legend.text = element_text(size = 7),
@@ -363,32 +419,33 @@ plot1 <- ggplot(journal.amlat %>%
     plot.margin = margin(t = 20, r = 20, b = 20, l = 80)
   ) +
   guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
   ylab("Idiomas") +
   xlab("Países") +
-  ggtitle("Relación entre países, idiomas y áreas en publicaciones de América Latina") +
-  scale_color_scico_d(palette = "berlin")  # También probá: "lajolla", "tokyo", "batlow"
-  #scale_color_viridis_d(option = "D")  # Utilizar una paleta de colores como Viridis
+  ggtitle("Relaciones entre:
+          países, idiomas y áreas en publicaciones de América Latina") +
+  #scale_color_scico_d(palette = "berlin")  # También probá: "lajolla", "tokyo", "batlow"
+  scale_color_viridis_d(option = "D")  # Utilizar una paleta de colores como Viridis
 ggsave("relacion_idiomas_temas-amlat.jpg",
-       plot = plot1,
        width = 3800, height = 1900, units = "px", dpi = 300)
 
 
 library(viridis)
 
-ggplot(english, aes(x = country, fill = Subjects)) +
-  geom_bar(position = "stack") +
-  scale_fill_viridis_d(option = "D") +  # Usar la paleta viridis
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylab("Número de registros") +
-  xlab("Países") +
-  ggtitle("Distribución de temas por países de América Latina con publicaciones unicamente en Inglés")
+# ggplot(english, aes(x = country, fill = Subjects)) +
+#   geom_bar(position = "stack") +
+#   scale_fill_viridis_d(option = "D") +  # Usar la paleta viridis
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   ylab("Número de registros") +
+#   xlab("Países") +
+#   ggtitle("Distribución de temas por países de América Latina con publicaciones unicamente en Inglés")
 
 #otro gráfico
 journal.amlat %>%
   group_by(Publisher)%>%
   count()%>%
-  filter(n>12)%>%
+  filter(n>15)%>%
   mutate(Publisher = reorder(Publisher, n)) %>%
   ggplot(aes(x = reorder(Publisher, n), y = n, fill = Publisher)) +  # Ordenar x según la frecuencia -n
   geom_col () + # si agrego , fill = "blue" cambio color
@@ -397,58 +454,64 @@ journal.amlat %>%
   scale_color_scico_d(palette = "bilbao") +
   ylab("Cantidad de revistas publicadas por") +
   xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en América Latina") +
-  coord_flip()
-ggsave("editorial_América Latina_min12.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
+  ggtitle("Editorial de publicación de revistas en América Latina",
+    subtitle = "Restringido a editoriales con más de 15 revistas") +
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+ggsave("editorial_América Latina_min15.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
   group_by(license) %>%
   count() %>%
-  filter(n >= 5) %>%
+  filter(n >= 10) %>%
   mutate(license = reorder(license, n)) %>%
   ggplot(aes(x = reorder(license, n), y = n, fill = license)) +
   geom_col() +
-  scale_fill_scico_d(palette = "berlin") +
+  scale_fill_scico_d(palette = "lapaz") +
   theme_minimal() +
-  theme(legend.position = "none") +  # debe ser "none", no "n"
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en América Latina") +
-  coord_flip()
+  theme(legend.position = "n") +  # debe ser "none", no "n"
+  ylab("Frecuencias") +
+  xlab("Tipo de licencias") +
+  ggtitle("Licencias utilizadas por revistas en América Latina") +
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave("licencia_AmLatina_min5.png", width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
   group_by(Review)%>%
   count()%>%
-  filter(n>=10)%>%
+  filter(n>=5)%>%
   mutate(Review = fct_reorder(Review, n)) %>%
   ggplot(aes(x = reorder(Review, n), y = n, fill = Review)) +
   geom_col () + # si agrego , fill = "blue" cambio color
   scale_fill_scico_d(palette = "berlin") +
   theme_minimal() +
   theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en América Latina") +
+  ylab("Frecuencia") +
+  xlab("Tipo de revisiones") +
+  ggtitle("Proceso de revisión para publicaciones para las revistas de América Latina") +
   scale_color_scico_d(palette = "lajolla") +
-  coord_flip()
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave("revision_AmLatina_min10.png", width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
   group_by(Subjects) %>%
   count() %>%
-  filter(n > 15) %>%
+  filter(n > 10) %>%
   mutate(Subjects = fct_reorder(Subjects, n)) %>%
   ggplot(aes(x = reorder(Subjects, n), y = n, fill = Subjects)) +
   geom_col() +
   theme_minimal() +
-  theme(legend.position = "none") +
+  theme(legend.position = "n") +
   ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en América Latina") +
-  scale_fill_scico_d(palette = "lajolla") +
-  coord_flip()
-ggsave("temas_América Latina.png", width = 3000, height = 1500, units = "px", dpi = 300)
+  xlab("Áreas") +
+  ggtitle("Áreas de publicación de revistas en América Latina",
+          subtitle = "Frecuencia mayor a 10") +
+  scale_fill_scico_d(palette = "lapaz") +
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+ggsave("areas_amLatina_min10.jpg", width = 3000, height = 1500, units = "px", dpi = 300)
 
 
 
@@ -465,7 +528,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
   # Helper para guardar
   guardar_grafico <- function(plot, nombre, pais) {
     ruta <- file.path(path_wd, paste0(nombre, "_", pais, ".jpg"))
-    ggsave(ruta, plot = plot, width = 10, height = 6)
+    ggsave(ruta, plot = plot, width = 3000, height = 1500, units = "px", dpi = 300)
   }
   
   # Gráfico por idioma
@@ -474,14 +537,15 @@ analizar_pais <- function(pais, data = journal.amlat) {
     count() %>%
     filter(n > 5) %>%
     mutate(language = reorder(language, n)) %>%
-    ggplot(aes(x = language, y = n, fill = language)) +
+    ggplot(aes(x = reorder(language, n), y = n, fill = language)) +
     geom_col() +
     theme_minimal() +
-    theme(legend.position = "none") +
+    theme(legend.position = "n") +
     ylab("Número de veces que aparecen") +
     xlab(NULL) +
     ggtitle(paste("Idiomas de publicación de revistas en", pais)) +
-    coord_flip()
+    coord_flip() +
+    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") 
   print(g1)
   guardar_grafico(g1, "idiomas_", pais)
   
@@ -491,14 +555,15 @@ analizar_pais <- function(pais, data = journal.amlat) {
     count() %>%
     filter(n > 5) %>%
     mutate(Publisher = reorder(Publisher, n)) %>%
-    ggplot(aes(x = Publisher, y = n, fill = Publisher)) +
+    ggplot(aes(x = reorder(Publisher, n), y = n, fill = Publisher)) +
     geom_col() +
     theme_minimal() +
     theme(legend.position = "none") +
     ylab("Cantidad de revistas publicadas por") +
     xlab(NULL) +
     ggtitle(paste("Editorial de publicación de revistas en", pais)) +
-    coord_flip()
+    coord_flip() +
+    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g2)
   guardar_grafico(g2, "editorial_", pais)
   
@@ -508,14 +573,15 @@ analizar_pais <- function(pais, data = journal.amlat) {
     count() %>%
     filter(n > 1) %>%
     mutate(license = reorder(license, n)) %>%
-    ggplot(aes(x = license, y = n, fill = license)) +
+    ggplot(aes(x = reorder(license, n), y = n, fill = license)) +
     geom_col() +
     theme_minimal() +
     theme(legend.position = "none") +
     ylab("Tipo de licencias") +
     xlab(NULL) +
     ggtitle(paste("Licencias de publicación de revistas en", pais)) +
-    coord_flip()
+    coord_flip() +
+    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g3)
   guardar_grafico(g3, "licencias_", pais)
   
@@ -525,14 +591,15 @@ analizar_pais <- function(pais, data = journal.amlat) {
     count() %>%
     filter(n > 5) %>%
     mutate(Review = reorder(Review, n)) %>%
-    ggplot(aes(x = Review, y = n, fill = Review)) +
+    ggplot(aes(x = reorder(Review, n), y = n, fill = Review)) +
     geom_col() +
     theme_minimal() +
     theme(legend.position = "none") +
     ylab("Proceso de revisión") +
     xlab(NULL) +
     ggtitle(paste("Proceso de revisión de revistas en", pais)) +
-    coord_flip()
+    coord_flip() +
+    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g4)
   guardar_grafico(g4, "revision_", pais)
   
@@ -542,14 +609,15 @@ analizar_pais <- function(pais, data = journal.amlat) {
     count() %>%
     filter(n > 5) %>%
     mutate(Subjects = reorder(Subjects, n)) %>%
-    ggplot(aes(x = Subjects, y = n, fill = Subjects)) +
+    ggplot(aes(x = reorder(Subjects, n), y = n, fill = Subjects)) +
     geom_col() +
     theme_minimal() +
     theme(legend.position = "none") +
     ylab("Temas") +
     xlab(NULL) +
     ggtitle(paste("Temas de publicación de revistas en", pais)) +
-    coord_flip()
+    coord_flip() +
+    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g5)
   guardar_grafico(g5, "temas_", pais)
   
@@ -566,7 +634,8 @@ analizar_pais <- function(pais, data = journal.amlat) {
     ylab("Identificadores persistentes") +
     xlab(NULL) +
     ggtitle(paste("Identificadores persistentes de revistas en", pais)) +
-    coord_flip()
+    coord_flip() +
+    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g5)
   guardar_grafico(g6, "identificadores_", pais)
 }
@@ -574,1011 +643,25 @@ analizar_pais <- function(pais, data = journal.amlat) {
 walk(selected_countries, analizar_pais)
  
 selected_countries
+analizar_pais("Argentina")
+analizar_pais("Brazil")
+analizar_pais("Chile")
 analizar_pais("Colombia")
+analizar_pais("Mexico")
+analizar_pais("Ecuador")
+analizar_pais("Costa Rica")
+analizar_pais("Bolivia, Plurinational State of")
+analizar_pais("Dominican Republic")
+analizar_pais("El Salvador")
+analizar_pais("Guatemala")
+analizar_pais("Honduras")
+analizar_pais("Nicaragua")
+analizar_pais("Panama") 
+analizar_pais("Paraguay")
+analizar_pais("Peru")
+analizar_pais("Uruguay")
+analizar_pais("Venezuela, Bolivarian Republic of")
 
 
 
 ##################################################################
-
-##COLOMBIA
-journal.colombia <- journal.select %>% filter(country == "Colombia")
-
-total.pais <- length(journal.colombia$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("Colombia", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.colombia ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.colombia %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Colombia") +
-  coord_flip()
-ggsave("idioma_colombia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.colombia %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>3)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Colombia") +
-  coord_flip()
-ggsave("editorial_colombia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.colombia %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Colombia") +
-  coord_flip()
-ggsave("licencia_colombia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.colombia %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=2)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Colombia") +
-  coord_flip()
-ggsave("revision_colombia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.colombia %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Colombia") +
-  coord_flip()
-ggsave("temas_colombia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-##Chile
-journal.Chile <- journal.select %>% filter(country == "Chile")
-
-total.pais <- length(journal.Chile$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("Chile", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Chile ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Chile %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Chile") +
-  coord_flip()
-ggsave("idioma_Chile.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Chile %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>2)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Chile") +
-  coord_flip()
-ggsave("editorial_Chile.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Chile %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Chile") +
-  coord_flip()
-ggsave("licencia_Chile.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Chile %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Chile") +
-  coord_flip()
-ggsave("revision_Chile.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Chile %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Chile") +
-  coord_flip()
-ggsave("temas_Chile.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-##Bolivia
-journal.Bolivia <- journal.select %>% filter(country == "Bolivia, Plurinational State of")
-
-total.pais <- length(journal.Bolivia$title)
-total.pais
-#total <- c("Total de países", total.journal)
-#pais <- c("Bolivia", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Bolivia ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Bolivia %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Bolivia") +
-  coord_flip()
-ggsave("idioma_Bolivia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Bolivia %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Bolivia") +
-  coord_flip()
-ggsave("editorial_Bolivia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Bolivia %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Bolivia") +
-  coord_flip()
-ggsave("licencia_Bolivia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Bolivia %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Bolivia") +
-  coord_flip()
-ggsave("revision_Bolivia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Bolivia %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Bolivia") +
-  coord_flip()
-ggsave("temas_Bolivia.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-##Paraguay
-journal.Paraguay <- journal.select %>% filter(country == "Paraguay")
-
-total.pais <- length(journal.Paraguay$title)
-total.pais
-#total <- c("Total de países", total.journal)
-#pais <- c("Paraguay", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Paraguay ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Paraguay %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Paraguay") +
-  coord_flip()
-ggsave("idioma_Paraguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Paraguay %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Paraguay") +
-  coord_flip()
-ggsave("editorial_Paraguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Paraguay %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Paraguay") +
-  coord_flip()
-ggsave("licencia_Paraguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Paraguay %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Paraguay") +
-  coord_flip()
-ggsave("revision_Paraguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Paraguay %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Paraguay") +
-  coord_flip()
-ggsave("temas_Paraguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-##Perú
-journal.Perú <- journal.select %>% filter(country == "Peru")
-
-total.pais <- length(journal.Perú$title)
-total.pais
-#total <- c("Total de países", total.journal)
-#pais <- c("Perú", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Perú ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Perú %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Perú") +
-  coord_flip()
-ggsave("idioma_Perú.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Perú %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>2)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Perú") +
-  coord_flip()
-ggsave("editorial_Perú.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Perú %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Perú") +
-  coord_flip()
-ggsave("licencia_Perú.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Perú %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Perú") +
-  coord_flip()
-ggsave("revision_Perú.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Perú %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Perú") +
-  coord_flip()
-ggsave("temas_Perú.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-##Uruguay
-journal.Uruguay <- journal.select %>% filter(country == "Uruguay")
-
-total.pais <- length(journal.Uruguay$title)
-total.pais
-#total <- c("Total de países", total.journal)
-#pais <- c("Uruguay", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Uruguay ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Uruguay %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Uruguay") +
-  coord_flip()
-ggsave("idioma_Uruguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Uruguay %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Uruguay") +
-  coord_flip()
-ggsave("editorial_Uruguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Uruguay %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Uruguay") +
-  coord_flip()
-ggsave("licencia_Uruguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Uruguay %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Uruguay") +
-  coord_flip()
-ggsave("revision_Uruguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Uruguay %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Uruguay") +
-  coord_flip()
-ggsave("temas_Uruguay.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-
-
-##Argentina
-journal.Argentina <- journal.select %>% filter(country == "Argentina")
-
-total.pais <- length(journal.Argentina$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("Argentina", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Argentina ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Argentina %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=2)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Argentina") +
-  coord_flip()
-ggsave("idioma_Argentina.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Argentina %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>3)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Argentina") +
-  coord_flip()
-ggsave("editorial_Argentina.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Argentina %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Argentina") +
-  coord_flip()
-ggsave("licencia_Argentina.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Argentina %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>2)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Argentina") +
-  coord_flip()
-ggsave("revision_Argentina.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Argentina %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Argentina") +
-  coord_flip()
-ggsave("temas_Argentina.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-##Brazil
-journal.Brazil <- journal.select %>% filter(country == "Brazil")
-
-total.pais <- length(journal.Brazil$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("Brazil", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Brazil ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Brazil %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=7)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Brasil") +
-  coord_flip()
-ggsave("idioma_Brazil.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Brazil %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>6)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Brasil") +
-  coord_flip()
-ggsave("editorial_Brazil.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Brazil %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=2)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Brasil") +
-  coord_flip()
-ggsave("licencia_Brazil.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Brazil %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>5)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Brasil") +
-  coord_flip()
-ggsave("revision_Brazil.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Brazil %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Brasil") +
-  coord_flip()
-ggsave("temas_Brazil.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-##Ecuador
-journal.Ecuador <- journal.select %>% filter(country == "Ecuador")
-
-total.pais <- length(journal.Ecuador$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("Ecuador", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Ecuador ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Ecuador %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Ecuador") +
-  coord_flip()
-ggsave("idioma_Ecuador.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-#otro gráfico
-journal.Ecuador %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>1)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Ecuador") +
-  coord_flip()
-ggsave("editorial_Ecuador.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Ecuador %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Ecuador") +
-  coord_flip()
-ggsave("licencia_Ecuador.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Ecuador %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>3)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Ecuador") +
-  coord_flip()
-ggsave("revision_Ecuador.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Ecuador %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Ecuador") +
-  coord_flip()
-ggsave("temas_Ecuador.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-##Mexico
-journal.Mexico <- journal.select %>% filter(country == "Mexico")
-
-total.pais <- length(journal.Mexico$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("Mexico", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.Mexico ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.Mexico %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en México") +
-  coord_flip()
-ggsave("idioma_Mexico.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.Mexico %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>3)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en México") +
-  coord_flip()
-ggsave("editorial_Mexico.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Mexico %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en México") +
-  coord_flip()
-ggsave("licencia_Mexico.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Mexico %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en México") +
-  coord_flip()
-ggsave("revision_Mexico.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.Mexico %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en México") +
-  coord_flip()
-ggsave("temas_Mexico.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-##Costa Rica
-journal.CR <- journal.select %>% filter(country == "Costa Rica")
-
-total.pais <- length(journal.CR$title)
-total.pais
-#total <- c("Total de pa?ses", total.journal)
-#pais <- c("CR", total.pais)
-#porc.pais <- data.frame(total, pais)
-#pie(porc.pais, labels = porc.pais)
-
-#journal.CR ver de unificar idiomas que tengan distinto orden y juntar las ciencias sociales 
-
-
-journal.CR %>%
-  group_by(language)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = reorder(language, -n), y = n, fill = language)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Número de veces que aparecen") +
-  xlab(NULL) +
-  ggtitle("Idiomas de publicación de revistas en Costa Rica") +
-  coord_flip()
-ggsave("idioma_CR.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-#otro gráfico
-journal.CR %>%
-  group_by(Publisher)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Publisher = reorder(Publisher, desc(n))) %>%
-  ggplot(aes(x = reorder(Publisher, -n), y = n, fill = Publisher)) + 
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Cantidad de revistas publicadas por") +
-  xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en Costa Rica") +
-  coord_flip()
-ggsave("editorial_CR2.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.CR %>%
-  group_by(license)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(license = reorder(license, n)) %>%
-  ggplot(aes(x = reorder(license, -n), y = n, fill = license)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Tipo de licencias") +
-  xlab(NULL) +
-  ggtitle("Licencias de publicación de revistas en Costa Rica") +
-  coord_flip()
-ggsave("licencia_CR.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.CR %>%
-  group_by(Review)%>%
-  count()%>%
-  filter(n>=1)%>%
-  mutate(Review = fct_reorder(Review, n)) %>%
-  ggplot(aes(x = reorder(Review, -n), y = n, fill = Review)) +
-  geom_col () + # si agrego , fill = "blue" cambio color
-  theme_minimal() +
-  theme(legend.position = "n") +
-  ylab("Proceso de revisión") +
-  xlab(NULL) +
-  ggtitle("Proceso de revisión de publicación de revistas en Costa Rica") +
-  coord_flip()
-ggsave("revision_CR.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-journal.CR %>%
-  ggplot(aes(x = reorder(Subjects, -table(Subjects)[Subjects]), fill = Subjects)) +
-  geom_bar(stat = "count") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  ylab("Frecuencia") +
-  xlab("Temas") +
-  ggtitle("Temas de publicación de revistas en Costa Rica") +
-  coord_flip()
-ggsave("temas_CR.png", width = 3000, height = 1500, units = "px", dpi = 300)
-
-
-
-#quiero agregar una fila con el total de revistas 
-#df = cbind('total', n=total.journal, 100)
-#porcentaje.pais <- nrow(df, porcentaje) 
-#https://vivaelsoftwarelibre.com/matrices-en-r-que-son-y-como-trabajar-con-ellas/
-#https://estadistica-dma.ulpgc.es/cursoR4ULPGC/9a-graf-Intro.html
-#https://datacarpentry.org/python-ecology-lesson-es/05-merging-data/
-#paises por continente https://rstudio-pubs-static.s3.amazonaws.com/779244_6f8c8742b793408e9ea6ed82dd283425.html
-
-#class(porcentaje)
-
-#journal.select %>%
-# Filter countries that start with "A" or "Z"
-# filter(substr(country, start = 1, stop = 3) %in% c("Col")) %>%
-
-
-
-#journal.colombia %>%
-# filter( )
-# journal.colombia_sp <- journal.colombia %>% filter(languages == "English")
-
-#journal.colombia.idioma <- journal.colombia %>% 
-#separate(language, c("id1", "id2", "id3", "id4", "id5"), sep=",",  extra = "merge")
-
-#ggplot(data = journal.colombia.idioma) +
-#geom_point(mapping = aes(x = journal.colombia$languages))
-
-#journal-pais <- highlight_key(journal.colombia, ~country.of.publisher, "Select a country")
-#ggplotly(p, tooltip = "Colombia") %>%
-# +   layout(title = "Click on a line to highlight a year") %>%
-#  +   highlight(dynamic = TRUE, selectize = TRUE)
-
-
-#library(htmltools)
-
-# Crea una página HTML que contiene el gráfico interactivo
-#graficos <- tagList(
-#  tags$head(
-  #  tags$script(src = "https://code.highcharts.com/highcharts.js"),
- #   tags$script(src = "https://code.highcharts.com/modules/exporting.js"),
-   # tags$script(src = "https://code.highcharts.com/modules/export-data.js")
-#  ),
- # tags$body(
-  #  hchart,
-   # tags$script(HTML("Highcharts.chart('container', {...});"))
-#  )
-#)
-
-# Guarda la página HTML en un archivo
-#save_html(graficos, file = "paises_total.html")
-
-
-#language_analysis <- journal.select %>%
-#  mutate(language = strsplit(language, ", ")) %>%
- # distinct() %>%
-#  arrange(language) %>%
- # group_by(language) %>%
-#  summarise(language = paste(language, collapse = ", "))
