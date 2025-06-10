@@ -55,7 +55,7 @@ journal <- read.csv("C:/git/analisis-doaj/assets/datos/2025_journalcsv.csv")
 as_tibble(journal)
 #nueva tabla con datos de interes 
 getwd()
-dir_output = getwd()
+
 colnames(journal)
 
 journal.select <- journal%>% select(Journal.title, Country.of.publisher, Languages.in.which.the.journal.accepts.manuscripts, Journal.license, Publisher, Review.process, Subjects, APC, Persistent.article.identifiers, Keywords)
@@ -156,7 +156,7 @@ paises_total <- hchart(
   )%>%
   hc_credits( #https://api.highcharts.com/highcharts/
     enabled = TRUE,
-    text = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.",
+    text = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.",
     href = "https://github.com/rominicky/analisis-doaj",
     itemStyle = list(fontSize = "8px", fontWeight = "normal"),
     position = list(align = "left", x = 10, y = -5)  # <-- Esto alinea a la izquierda
@@ -171,7 +171,7 @@ saveWidget(paises_total, file = "paises_total-interactivo.html")
 #   labs(
 #     title = "Porcentaje de países América Latina",
 #     fill = "País",
-#     caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.",
+#     caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.",
 #     x = NULL,
 #     y = NULL
 #   ) +
@@ -196,7 +196,7 @@ saveWidget(paises_total, file = "paises_total-interactivo.html")
 
 total.journal <- length(journal.select$title)
 total.journal
-
+dir_output = setwd("C:/git/analisis-doaj/assets/plots/2025")
 #en todo el mundo 
 journal.select %>%
   group_by(language)%>%
@@ -213,7 +213,7 @@ journal.select %>%
   xlab(NULL) +
   ggtitle("Idiomas de publicación de revistas en todo el mundo") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 
 ggsave(
   filename = file.path(dir_output, "idiomas-total_min100.jpg"),
@@ -222,6 +222,7 @@ ggsave(
   units = "px",
   dpi = 300
 )
+
 
 #idioma por pais
 journal.select %>%
@@ -241,7 +242,7 @@ journal.select %>%
   ylab("Número de publicaciones") +
   #xlab(NULL) +
   ggtitle("Publicaciones por idioma y país") +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(
   filename = file.path(dir_output, "publ_paises-idiomas-total_min50-mx750-2024.jpg"),
   width = 3000,
@@ -271,7 +272,7 @@ journal.select %>%
   ylab("Número de publicaciones") +
   scale_fill_viridis_d(option = "D") +
   ggtitle("Publicaciones por país e idioma") +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(
   filename = file.path(dir_output, "publ_paises-idiomas-total_min300.jpg"),
   width = 3000,
@@ -300,7 +301,7 @@ plot_base <- journal.select %>%
   xlab(NULL) +
   ylab("Número de publicaciones") +
   ggtitle("Publicaciones por país e idioma") +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 
 # Hacerlo interactivo
 ggplotly(plot_base, tooltip = "text")
@@ -334,7 +335,7 @@ journal.select %>%
   xlab(NULL) +
   ggtitle("Idiomas de publicación en todo el mundo diferenciado por países") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
   facet_wrap(~ continent) +  # Usar facetas por continente
   scale_fill_viridis_d(option = "D") +  # Usar una paleta con más colores
   theme(
@@ -361,7 +362,7 @@ class(journal.select)
 #   xlab(NULL) +
 #   ggtitle("Idiomas de publicación de revistas en todo el mundo por país") +
 #   coord_flip() +
-#   labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+#   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
 #   facet_wrap(~ continent, scales = "free_y") +  # Ajusta las escalas de cada faceta por continente
 #   scale_fill_viridis_d(option = "H") +  # Paleta viridis con más colores, ajustada para una mejor visualización
 #   theme(
@@ -405,7 +406,7 @@ journal.amlat %>%
   xlab(NULL) +
   ggtitle("Idiomas de publicaciones sobre 'Social Sciences' en América Latina") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename= file.path(dir_output, "social_sciences_idioma_AmLat.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 
@@ -424,7 +425,7 @@ journal.amlat %>%
   xlab(NULL) +
   ggtitle("Idiomas de publicaciones sobre Ciencias Sociales y Humanidades en América Latina") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename = file.path(dir_output, "area_cssoc_hum_idioma_AmLatina.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)  
   
 #############################################################
@@ -453,7 +454,7 @@ journal.amlat %>%
     subtitle = "Solo se muestran combinaciones con al menos 10 registros"
   ) +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename = file.path(dir_output, "idiomas-amlat_min5.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 english <- journal.amlat[journal.amlat$language == "English", ]
@@ -501,7 +502,7 @@ ggplot(journal.amlat %>%
     plot.margin = margin(t = 20, r = 20, b = 10, l = 20)
   ) +
   guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
   ylab("Idiomas") +
   xlab("Países") +
   ggtitle("Relaciones entre:
@@ -552,7 +553,7 @@ journal.amlat %>%
   ggtitle("Editorial de publicación de revistas en América Latina",
     subtitle = "Restringido a editoriales con más de 15 revistas") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename = file.path(dir_output, "editorial_América Latina_min15.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
@@ -569,7 +570,7 @@ journal.amlat %>%
   xlab("Tipo de licencias") +
   ggtitle("Licencias utilizadas por revistas en América Latina") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename = file.path(dir_output, "licencia_AmLatina_min5.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
@@ -587,7 +588,7 @@ journal.amlat %>%
   ggtitle("Proceso de revisión para publicaciones para las revistas de América Latina") +
   #scale_color_scico_d(palette = "lajolla") +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename = file.path(dir_output, "revision_AmLatina_min8.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 journal.amlat %>%
@@ -605,10 +606,107 @@ journal.amlat %>%
           subtitle = "Frecuencia mayor a 12") +
   scale_fill_manual(values = paleta2) +
   coord_flip() +
-  labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(filename = file.path(dir_output, "areas_amLatina_min12.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
+df_brasil <- journal.amlat[journal.amlat$country == "Brazil", ]
+df_brasil %>%
+  group_by(language, Subjects) %>%
+  count() %>%
+  filter(n >= 5) %>%
+  mutate(language = reorder(language, n)) %>%
+  ggplot(aes(x = language, y = n, fill = Subjects)) +
+  geom_col() +
+  #geom_text(aes(label = n), hjust = -0.1, size = 3) +
+  scale_fill_manual(values=paleta2) +
+  #scale_y_continuous(labels = comma) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.y = element_text(size = 10)
+  ) +
+  ylab("Número de publicaciones") +
+  xlab("Idioma") +
+  ggtitle(
+    "Distribución de publicaciones académicas en Brasil agrupadas por idiomas y temas",
+    subtitle = "Solo se muestran combinaciones con al menos 5 registros"
+  ) +
+  coord_flip() +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+ggsave(filename = file.path(dir_output, "idiomas_temas-brasil_min5.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
+
+ggplot(df_brasil %>% 
+         group_by(language, Ids, Subjects) %>% 
+         summarise(count = n()) %>% 
+         filter(count >= 3 ) %>% 
+         mutate(language = reorder(language, count)), 
+       aes(x = Ids, y = language, color = Subjects)) +
+  geom_point(size = 8, alpha = 0.7) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 1 , size = 12),  # Espacio bajo el título
+    axis.text.x = element_text(angle = 45, hjust = 0.7),
+    legend.position = "right",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.spacing.y = unit(0.05, "cm"),  # Espacio entre filas de leyenda
+    plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+  ) +
+  guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+  ylab("Idiomas") +
+  xlab("Identificadores") +
+  ggtitle("Relaciones entre:
+          identificadores, idiomas y áreas en publicaciones de Brasil") +
+  #scale_color_scico_d(palette = "tokyo")  # También probá: "lajolla", "tokyo", "batlow"
+  scale_color_manual(values = paletas)
+#scale_fill_nejm()
+#scale_color_viridis_d(option = "A")  # Utilizar una paleta de colores como Viridis
+ggsave(
+  filename = file.path(dir_output, "brasil-idiomas-id-temas_min3.jpg"),
+  width = 3000,
+  height = 1500,
+  units = "px",
+  dpi = 300)
+
+#grafico relaciones lo hice por países separado porque en algunos no se veía bien
+
+#grafico relaciones
+ggplot(journal.amlat[journal.amlat$country == "Peru", ]%>%
+         group_by(language, Ids, Subjects) %>% 
+         summarise(count = n()) %>% 
+         filter(count >= 2 ) %>% 
+         mutate(language = reorder(language, count)), 
+       aes(x = Ids, y = language, color = Subjects)) +
+  geom_point(size = 8, alpha = 0.7) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 1 , size = 12),  # Espacio bajo el título
+    axis.text.x = element_text(angle = 45, hjust = 0.7),
+    legend.position = "right",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.spacing.y = unit(0.05, "cm"),  # Espacio entre filas de leyenda
+    plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+  ) +
+  guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+  ylab("Idiomas") +
+  xlab("Identificadores") +
+  ggtitle(paste("Relaciones entre:
+          identificadores, idiomas y áreas en publicaciones de Perú")) +
+  #scale_color_scico_d(palette = "tokyo")  # También probá: "lajolla", "tokyo", "batlow"
+  scale_color_manual(values = paleta2)
+ggsave(
+  filename = file.path(dir_output, "peru-relaciones_min4.jpg"),
+  width = 3000,
+  height = 1500,
+  units = "px",
+  dpi = 300)
 
 analizar_pais <- function(pais, data = journal.amlat) {
   library(dplyr)
@@ -630,7 +728,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
   g1 <- journal.pais %>%
     group_by(language) %>%
     count() %>%
-    filter(n > 5) %>%
+    filter(n > 1) %>%
     mutate(language = reorder(language, n)) %>%
     ggplot(aes(x = reorder(language, n), y = n, fill = language)) +
     geom_col() +
@@ -640,7 +738,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
     xlab(NULL) +
     ggtitle(paste("Idiomas de publicación de revistas en", pais)) +
     coord_flip() +
-    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.") 
+    labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") 
   print(g1)
   guardar_grafico(g1, "idiomas_", pais)
   
@@ -648,7 +746,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
   g2 <- journal.pais %>%
     group_by(Publisher) %>%
     count() %>%
-    filter(n > 5) %>%
+    filter(n > 1) %>%
     mutate(Publisher = reorder(Publisher, n)) %>%
     ggplot(aes(x = reorder(Publisher, n), y = n, fill = Publisher)) +
     geom_col() +
@@ -658,7 +756,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
     xlab(NULL) +
     ggtitle(paste("Editorial de publicación de revistas en", pais)) +
     coord_flip() +
-    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+    labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g2)
   guardar_grafico(g2, "editorial_", pais)
   
@@ -676,7 +774,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
     xlab(NULL) +
     ggtitle(paste("Licencias de publicación de revistas en", pais)) +
     coord_flip() +
-    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+    labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g3)
   guardar_grafico(g3, "licencias_", pais)
   
@@ -684,7 +782,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
   g4 <- journal.pais %>%
     group_by(Review) %>%
     count() %>%
-    filter(n > 5) %>%
+    filter(n > 1) %>%
     mutate(Review = reorder(Review, n)) %>%
     ggplot(aes(x = reorder(Review, n), y = n, fill = Review)) +
     geom_col() +
@@ -694,7 +792,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
     xlab(NULL) +
     ggtitle(paste("Proceso de revisión de revistas en", pais)) +
     coord_flip() +
-    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+    labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g4)
   guardar_grafico(g4, "revision_", pais)
   
@@ -702,7 +800,7 @@ analizar_pais <- function(pais, data = journal.amlat) {
   g5 <- journal.pais %>%
     group_by(Subjects) %>%
     count() %>%
-    filter(n > 5) %>%
+    filter(n > 1) %>%
     mutate(Subjects = reorder(Subjects, n)) %>%
     ggplot(aes(x = reorder(Subjects, n), y = n, fill = Subjects)) +
     geom_col() +
@@ -712,17 +810,19 @@ analizar_pais <- function(pais, data = journal.amlat) {
     xlab(NULL) +
     ggtitle(paste("Temas de publicación de revistas en", pais)) +
     coord_flip() +
-    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+    labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
   print(g5)
   guardar_grafico(g5, "temas_", pais)
   
-  # Gráfico por temas
+  # Gráfico por Identificadores
   g6 <- journal.pais %>%
-    group_by(id) %>%
+    group_by(Ids) %>%
     count() %>%
-    filter(n > 5) %>%
-    mutate(id = reorder(id, n)) %>%
-    ggplot(aes(x = id, y = n, fill = id)) +
+    filter(n > 1) %>%
+    mutate(id = reorder(Ids, n),
+    # Reemplazar valores NA en Ids con "N/A"
+    Ids = ifelse(is.na(Ids), "N/A", Ids)) %>%
+    ggplot(aes(x = Ids, y = n, fill = Ids)) +
     geom_col() +
     theme_minimal() +
     theme(legend.position = "none") +
@@ -730,128 +830,12 @@ analizar_pais <- function(pais, data = journal.amlat) {
     xlab(NULL) +
     ggtitle(paste("Identificadores persistentes de revistas en", pais)) +
     coord_flip() +
-    labs(caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ.")
-  print(g5)
+    labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
+  print(g6)
   guardar_grafico(g6, "identificadores_", pais)
+  
 }
 
-#mejorado con IA
-analizar_pais <- function(pais, data = journal.amlat, dir_output = "graficos") {
-  # Cargar librerías
-  suppressPackageStartupMessages({
-    library(dplyr)
-    library(ggplot2)
-    library(forcats)
-  })
-  
-  # Verificar/crear directorio de salida
-  if (!dir.exists(dir_output)) {
-    dir.create(dir_output)
-  }
-  
-  # Verificar estructura de los datos
-  if (!"country" %in% names(data)) {
-    stop("El dataframe no contiene una columna 'country'")
-  }
-  
-  # Filtrar datos por país
-  journal.pais <- data %>% 
-    filter(country == pais)
-  
-  if (nrow(journal.pais) == 0) {
-    stop("No se encontraron revistas para el país especificado: ", pais)
-  }
-  
-  # Mostrar resumen estadístico
-  total.pais <- nrow(journal.pais)
-  message("\n=== Análisis para: ", pais, " ===")
-  message("Total de revistas: ", total.pais)
-  
-  # Función helper para guardar gráficos
-  guardar_grafico <- function(plot, nombre, ancho = 30, alto = 15) {
-    nombre_archivo <- paste0(nombre, tolower(gsub(" ", "_", pais)), ".jpg")
-    ruta <- file.path(dir_output, nombre_archivo)
-    
-    ggsave(
-      filename = ruta,
-      plot = plot,
-      width = ancho,
-      height = alto,
-      units = "cm",
-      dpi = 300
-    )
-    message("Gráfico guardado: ", nombre_archivo)
-  }
-  
-  # Función para crear gráficos de barras horizontales simplificados
-  crear_grafico_simple <- function(var, titulo, filtro_min = 5) {
-    # Verificar si la variable existe
-    if (!var %in% names(journal.pais)) {
-      warning("La columna '", var, "' no existe en los datos. Omitiendo gráfico.")
-      return(NULL)
-    }
-    
-    # Preparar datos
-    plot_data <- journal.pais %>%
-      count(!!sym(var)) %>%
-      filter(n >= filtro_min)
-    
-    if (nrow(plot_data) == 0) {
-      warning("No hay suficientes datos (n >= ", filtro_min, ") para '", var, "'. Omitiendo gráfico.")
-      return(NULL)
-    }
-    
-    # Crear gráfico minimalista
-    plot_data %>%
-      mutate(categoria = fct_reorder(!!sym(var), n)) %>%
-      ggplot(aes(x = categoria, y = n, fill = categoria)) +
-      geom_col(show.legend = FALSE) +
-      theme_minimal() +
-      theme(
-        plot.title = element_text(size = 12, face = "bold"),
-        plot.caption = element_text(size = 8, color = "gray30"),
-        axis.text = element_text(size = 10),
-        axis.title = element_text(size = 10)
-      ) +
-      labs(
-        y = "Cantidad de revistas",
-        x = NULL,
-        title = paste(titulo, "en", pais),
-        caption = "Citar como: Romina De León, 2025. Análisis de revistas latinoamericanas en DOAJ."
-      ) +
-      coord_flip()
-  }
-  
-  # Variables a graficar (ajusta según tu dataframe)
-  variables_grafico <- c(
-    "language" = "Idiomas de publicación",
-    "Publisher" = "Editoriales",
-    "license" = "Licencias de publicación",
-    "Review" = "Procesos de revisión",
-    "Subjects" = "Temas de publicación"
-  )
-  
-  # Filtrar solo variables que existen
-  variables_grafico <- variables_grafico[names(variables_grafico) %in% names(journal.pais)]
-  
-  # Generar gráficos
-  graficos <- list()
-  for (var in names(variables_grafico)) {
-    g <- crear_grafico_simple(var, variables_grafico[var])
-    if (!is.null(g)) {
-      print(g)
-      guardar_grafico(g, paste0(var, "_"))
-      graficos[[var]] <- g
-    }
-  }
-  
-  # Retornar resultados
-  invisible(list(
-    datos = journal.pais,
-    total = total.pais,
-    graficos = graficos
-  ))
-}
 
 
 walk(selected_countries, analizar_pais)
