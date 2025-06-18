@@ -26,6 +26,9 @@ install.packages('magritter')
 install.packages("ggplot2")
 install.packages('rio')
 install.packages('xlsx')
+install.packages("echarts4r")
+install.packages("plotly")
+library("echarts4r")
 library(treemapify)
 library(tidyverse)
 library(tidytext)
@@ -42,10 +45,7 @@ library(stringr)
 library(highcharter)
 library(webshot)
 library(htmlwidgets)
-install.packages("echarts4r")
-library("echarts4r")
 
-install.packages("plotly")
 library(plotly)
 #creamos un data.frame con la base de datos: mis_datos
 #Gimena quiere que se haga una jupyter para levantar en vivo y generar los gráficos
@@ -125,16 +125,20 @@ Honduras", "Nicaragua", "Panama", "Chile", "Paraguay", "Peru", "Uruguay", "Venez
 filtered_data <- porcen_journal %>% filter(country %in% selected_countries)
 
 
-
+#américa latina
 paises_total <- hchart(
- filtered_data,
+  filtered_data,
   type = "pie",
   hcaes(x = country, y = percentage), 
   dataLabels = list(enabled = TRUE),  # Deshabilitar etiquetas de datos
   showInLegend = TRUE
 ) %>%
-  hc_title(text = "<b>Porcentaje de países de América Latina</b>") %>%
-  hc_subtitle(text = "<i>Países de América Latina respecto al total de los países del mundo</i>") %>%
+  hc_title(text = paste0(
+    "<b>Porcentaje de las </b>",
+    sum(filtered_data$n),
+    "<b> publicaciones en América Latina</b>"
+  )) %>%
+  hc_subtitle(text = paste0("<i>Respecto a las ", length(journal.select$title) ," publiacciones de todo el mundo</i>")) %>%
   hc_exporting(
     enabled = TRUE, # Habilitar exportación
     filename = "paises_total"
@@ -162,8 +166,6 @@ paises_total <- hchart(
     position = list(align = "left", x = 10, y = -5)  # <-- Esto alinea a la izquierda
   )
 saveWidget(paises_total, file = "paises_total-interactivo.html")
-
-
 
 # p <- ggplot(filtered_data, aes(x = "", y = percentage, fill = country)) +
 #   geom_bar(stat = "identity", width = 1) +
@@ -256,7 +258,7 @@ journal.select %>%
   group_by(country, language) %>%
   count() %>%
   ungroup() %>%
-  filter(n >= 300 ) %>%
+  filter(n >= 200 ) %>%
   mutate(country = reorder_within(country, n, language)) %>%  # para que ordene dentro de cada panel
   ggplot(aes(x = country, y = n, fill = country)) +
   geom_col(show.legend = FALSE) +
@@ -269,12 +271,12 @@ journal.select %>%
     strip.text = element_text(size = 7, face = "bold")
   ) +
   xlab(NULL) +
-  ylab("Número de publicaciones") +
+  ylab("Número de publicaciones, mínimo 200 publicaciones") +
   scale_fill_viridis_d(option = "D") +
   ggtitle("Publicaciones por país e idioma") +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
 ggsave(
-  filename = file.path(dir_output, "publ_paises-idiomas-total_min300.jpg"),
+  filename = file.path(dir_output, "publ_paises-idiomas-total_min200.jpg"),
   width = 3000,
   height = 1500,
   units = "px",
@@ -325,27 +327,27 @@ journal.select <- journal.select %>%
 journal.select %>%
   group_by(language, country, continent) %>%
   count() %>%
-  filter(n >= 200 ) %>%
+  filter(n >= 50 ) %>%
   mutate(language = reorder(language, n)) %>%
-  ggplot(aes(x = language, y = n, fill = country)) +  
+  ggplot(aes(x = continent, y = n, fill = language)) +  
   geom_col(show.legend = FALSE) +  
   #geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +
   theme_minimal() +
-  ylab("Número de publicaciones") +
+  ylab("Número de publicaciones, mínimo 50") +
   xlab(NULL) +
-  ggtitle("Idiomas de publicación en todo el mundo diferenciado por países") +
+  ggtitle("Idiomas de publicación en todo el mundo, diferenciados por continente") +
   coord_flip() +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
-  facet_wrap(~ continent) +  # Usar facetas por continente
+  facet_wrap(~ language) +  # Usar facetas por continente
   scale_fill_viridis_d(option = "D") +  # Usar una paleta con más colores
   theme(
     plot.title = element_text(hjust = 0, size = 16),
-    axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-    axis.text.y = element_text(size = 10),
-    axis.title.y = element_text(size = 12),
-    plot.margin = margin(10, 10, 10, 10)
+    axis.text.x = element_text(size = 8, angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_text(size = 10),
+    plot.margin = margin(5, 5, 5, 5)
   )
-ggsave(filename = file.path(dir_output, "idiomas-continente_min200.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave(filename = file.path(dir_output, "idiomasporcontinente_min50.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 class(journal.select)
 
 #similar con botones
@@ -380,7 +382,8 @@ class(journal.select)
 ##AMERICA LATINA
 
 journal.amlat <- journal.select[journal.select$country %in% selected_countries, ]
-
+journal.amlat <- journal.amlat %>% mutate(across(.cols = everything(),.fns = ~ ifelse(. == "", "N/C", .)))
+# reemplazar celdas vacías por N/C funcionó el accros con ifelse journal.amlat <- journal.amlat[journal.amlat$Ids <- na_if(journal.amlat$Ids, "N/C")]
 total.pais <- length(journal.amlat$title)
 total.pais
 #total <- c("Total de pa?ses", total.journal)
@@ -467,12 +470,12 @@ library(scico)
 library(Cairo)
 library(colorspace)
 paleta <- c(
-  scico(8, palette = "tokyo"),
+  scico(8, palette = "tokyo", direction = -1),
   scico(8, palette = "roma"),
-  viridis(8, option = "plasma"),
+  viridis(8, option = "plasma", direction = -1),
   pal_nejm("default")(8))
 
-viridis_names <-c("magma", "inferno", "plasma", "viridis", "cividis", "rocket", "mako", "turbo")
+viridis_names <-c(viridis(8, option = "magma", direction = -1), viridis(8, option = "plasma"), viridis(8, option = "inferno", direction = -1), viridis(8, option = "viridis"), viridis(8, option = "cividis", direction = -1), viridis(8, option = "rocket"), viridis(8, option = "mako", direction = -1), viridis(8, option = "turbo"))
 paleta2 <- c(
   met.brewer( "Renoir"),
   met.brewer("Cassatt1"),
@@ -482,11 +485,13 @@ paleta2 <- c(
   met.brewer("Tam"),
   met.brewer("Signac"))
 paletas <- c(paleta, paleta2)
+paleta3 <- c(met.brewer("Signac"), met.brewer("Renoir"))
+
 # Crear el gráfico de dispersión con etiquetas de conteo
 ggplot(journal.amlat %>% 
          group_by(language, country, Subjects) %>% 
          summarise(count = n()) %>% 
-         filter(count >= 4 ) %>% 
+         filter(count >= 7 ) %>% 
          mutate(language = reorder(language, count)), 
        aes(x = country, y = language, color = Subjects)) +
   geom_point(size = 8, alpha = 0.7) +
@@ -503,27 +508,66 @@ ggplot(journal.amlat %>%
   ) +
   guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
-  ylab("Idiomas") +
+  ylab("Idiomas, mínimo de 7 publicaciones") +
   xlab("Países") +
   ggtitle("Relaciones entre:
           países, idiomas y áreas en publicaciones de América Latina") +
   #scale_color_scico_d(palette = "tokyo")  # También probá: "lajolla", "tokyo", "batlow"
-  scale_color_manual(values = paletas)
+  scale_color_manual(values = viridis_names)
   #scale_fill_nejm()
   #scale_color_viridis_d(option = "A")  # Utilizar una paleta de colores como Viridis
 ggsave(
-  filename = file.path(dir_output, "idiomas-amlat_min5.jpg"),
+  filename = file.path(dir_output, "idiomas-amlat_min7.jpg"),
   width = 3000,
   height = 1500,
   units = "px",
   dpi = 300)
 
-install.packages("Polychrome")
+viridis2 <- c(viridis(8, option = "plasma", direction = -1), viridis(8, option = "mako"), viridis(8, option = "turbo"))
+viridis3 <- c(viridis(8, option = "turbo"), viridis(8, option = "mako"),viridis(8, option = "plasma"))
+
+# Crear el gráfico de dispersión con etiquetas de conteo
+ggplot(journal.amlat %>% 
+         group_by(language, country, Ids) %>% 
+         summarise(count = n()) %>% 
+         filter(count >= 2 ) %>% 
+         mutate(country = reorder(country, count)), 
+       aes(x = Ids, y = country, color = language)) +
+  geom_point(size = 8, alpha = 0.7) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 1 , size = 12),  # Espacio bajo el título
+    axis.text.x = element_text(angle = 60, hjust = 1),
+    legend.position = "right",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 7),
+    legend.text = element_text(size = 7),
+    legend.spacing.y = unit(0.1, "cm"),  # Espacio entre filas de leyenda
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
+  ) +
+  guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+  ylab("Países de publicación") +
+  xlab("Indicadores persistentes") +
+  ggtitle("Relaciones entre: países, idiomas
+          e indicadores persistentes en publicaciones de América Latina") +
+  #scale_color_scico_d(palette = "batlow")  # También probá: "lajolla", "tokyo", "batlow"
+  scale_color_manual(values = viridis3)
+#scale_fill_nejm()#scale_fill_paleta3nejm()
+#scale_color_viridis_d(option = "H")  # Utilizar una paleta de colores como Viridis
+ggsave(
+  filename = file.path(dir_output, "relacion_ids_idiomas_paises-amlat_min2.jpg"),
+  width = 3000,
+  height = 1500,
+  units = "px",
+  dpi = 300)
+
+#install.packages("Polychrome")
 library(Polychrome)
-install.packages("MetBrewer")
+#install.packages("MetBrewer")
 library(MetBrewer)
 
-install.packages("ggsci")
+#install.packages("ggsci")
 library(ggsci)
 
 library(viridis)
@@ -547,10 +591,10 @@ journal.amlat %>%
   geom_col () + # si agrego , fill = "blue" cambio color
   theme_minimal() +
   theme(legend.position = "n") +
-  scale_fill_manual(values = paleta2) +
+  scale_fill_manual(values = paleta) +
   ylab("Cantidad de revistas publicadas por") +
   xlab(NULL) +
-  ggtitle("Editorial de publicación de revistas en América Latina",
+  ggtitle("Editoriales de publicaciones de revistas en América Latina",
     subtitle = "Restringido a editoriales con más de 15 revistas") +
   coord_flip() +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
@@ -580,7 +624,8 @@ journal.amlat %>%
   mutate(Review = fct_reorder(Review, n)) %>%
   ggplot(aes(x = reorder(Review, n), y = n, fill = Review)) +
   geom_col () + # si agrego , fill = "blue" cambio color
-  scale_fill_scico_d(palette = "tokyo") +
+  #scale_fill_scico_d(palette = "tokyo") +
+  scale_fill_manual(values = paleta2) +
   theme_minimal() +
   theme(legend.position = "n") +
   ylab("Frecuencia") +
@@ -594,7 +639,7 @@ ggsave(filename = file.path(dir_output, "revision_AmLatina_min8.jpg"), width = 3
 journal.amlat %>%
   group_by(Subjects) %>%
   count() %>%
-  filter(n > 12) %>%
+  filter(n > 15) %>%
   mutate(Subjects = fct_reorder(Subjects, n)) %>%
   ggplot(aes(x = reorder(Subjects, n), y = n, fill = Subjects)) +
   geom_col() +
@@ -603,22 +648,22 @@ journal.amlat %>%
   ylab("Frecuencia") +
   xlab("Áreas") +
   ggtitle("Áreas de publicación de revistas en América Latina",
-          subtitle = "Frecuencia mayor a 12") +
+          subtitle = "Frecuencia mayor a 15") +
   scale_fill_manual(values = paleta2) +
   coord_flip() +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
-ggsave(filename = file.path(dir_output, "areas_amLatina_min12.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave(filename = file.path(dir_output, "areas_amLatina_min15.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 df_brasil <- journal.amlat[journal.amlat$country == "Brazil", ]
 df_brasil %>%
   group_by(language, Subjects) %>%
   count() %>%
-  filter(n >= 5) %>%
+  filter(n >= 10) %>%
   mutate(language = reorder(language, n)) %>%
   ggplot(aes(x = language, y = n, fill = Subjects)) +
   geom_col() +
   #geom_text(aes(label = n), hjust = -0.1, size = 3) +
-  scale_fill_manual(values=paleta2) +
+  scale_fill_manual(values=paleta3) +
   #scale_y_continuous(labels = comma) +
   theme_minimal() +
   theme(
@@ -634,16 +679,24 @@ df_brasil %>%
   ) +
   coord_flip() +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.")
-ggsave(filename = file.path(dir_output, "idiomas_temas-brasil_min5.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
+ggsave(filename = file.path(dir_output, "idiomas_temas-brasil_min10.jpg"), width = 3000, height = 1500, units = "px", dpi = 300)
 
 
 ggplot(df_brasil %>% 
-         group_by(language, Ids, Subjects) %>% 
-         summarise(count = n()) %>% 
-         filter(count >= 3 ) %>% 
-         mutate(language = reorder(language, count)), 
+         group_by(language, Ids, Subjects) %>%
+         summarise(count = n(), .groups = "drop") %>%
+         mutate(
+           Subjects = ifelse(
+             Subjects %in% (count(., Subjects, sort = TRUE) %>%
+                              slice_head(n = 20) %>%
+                              pull(Subjects)),
+             Subjects, "Otros"
+           ),
+           Subjects = fct_reorder(Subjects, count, .fun = sum)
+         ), 
        aes(x = Ids, y = language, color = Subjects)) +
-  geom_point(size = 8, alpha = 0.7) +
+  geom_point(size = 6, alpha = 0.8) +
+  #facet_wrap(~ language) + 
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 1 , size = 12),  # Espacio bajo el título
@@ -653,7 +706,7 @@ ggplot(df_brasil %>%
     legend.title = element_text(size = 6),
     legend.text = element_text(size = 6),
     legend.spacing.y = unit(0.05, "cm"),  # Espacio entre filas de leyenda
-    plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
   ) +
   guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
   labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
@@ -666,7 +719,7 @@ ggplot(df_brasil %>%
 #scale_fill_nejm()
 #scale_color_viridis_d(option = "A")  # Utilizar una paleta de colores como Viridis
 ggsave(
-  filename = file.path(dir_output, "brasil-idiomas-id-temas_min3.jpg"),
+  filename = file.path(dir_output, "relaciones_brasil-idiomas-id-subjects.jpg"),
   width = 3000,
   height = 1500,
   units = "px",
@@ -676,10 +729,17 @@ ggsave(
 
 #grafico relaciones
 ggplot(journal.amlat[journal.amlat$country == "Peru", ]%>%
-         group_by(language, Ids, Subjects) %>% 
-         summarise(count = n()) %>% 
-         filter(count >= 2 ) %>% 
-         mutate(language = reorder(language, count)), 
+         group_by(language, Ids, Subjects) %>%
+         summarise(count = n(), .groups = "drop") %>%
+         mutate(
+           Subjects = ifelse(
+             Subjects %in% (count(., Subjects, sort = TRUE) %>%
+                              slice_head(n = 20) %>%
+                              pull(Subjects)),
+             Subjects, "Otros"
+           ),
+           Subjects = fct_reorder(Subjects, count, .fun = sum)
+         ), 
        aes(x = Ids, y = language, color = Subjects)) +
   geom_point(size = 8, alpha = 0.7) +
   theme_minimal() +
@@ -700,13 +760,55 @@ ggplot(journal.amlat[journal.amlat$country == "Peru", ]%>%
   ggtitle(paste("Relaciones entre:
           identificadores, idiomas y áreas en publicaciones de Perú")) +
   #scale_color_scico_d(palette = "tokyo")  # También probá: "lajolla", "tokyo", "batlow"
-  scale_color_manual(values = paleta2)
+  scale_color_manual(values = viridis3)
 ggsave(
-  filename = file.path(dir_output, "peru-relaciones_min4.jpg"),
+  filename = file.path(dir_output, "peru-relaciones.jpg"),
   width = 3000,
   height = 1500,
   units = "px",
   dpi = 300)
+
+#grafico relaciones
+ggplot(journal.amlat[journal.amlat$country == "Argentina", ]%>%
+         group_by(language, Ids, Subjects) %>%
+         summarise(count = n(), .groups = "drop") %>%
+         mutate(
+           Subjects = ifelse(
+             Subjects %in% (count(., Subjects, sort = TRUE) %>%
+                              slice_head(n = 20) %>%
+                              pull(Subjects)),
+             Subjects, "Otros"
+           ),
+           Subjects = fct_reorder(Subjects, count, .fun = sum)
+         ), 
+       aes(x = Ids, y = language, color = Subjects)) +
+  geom_point(size = 8, alpha = 0.7) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 1 , size = 12),  # Espacio bajo el título
+    axis.text.x = element_text(angle = 45, hjust = 0.7),
+    legend.position = "right",
+    legend.box = "horizontal",
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    legend.spacing.y = unit(0.05, "cm"),  # Espacio entre filas de leyenda
+    plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+  ) +
+  guides(color = guide_legend(ncol = 2, byrow = TRUE)) +
+  labs(caption = "Citar como: Romina De León y Gimena del Rio, 2025. Análisis de revistas latinoamericanas en DOAJ.") +
+  ylab("Idiomas") +
+  xlab("Identificadores") +
+  ggtitle(paste("Relaciones entre:
+          identificadores, idiomas y áreas en publicaciones de Argentina")) +
+  #scale_color_scico_d(palette = "tokyo")  # También probá: "lajolla", "tokyo", "batlow"
+  scale_color_manual(values = viridis3)
+ggsave(
+  filename = file.path(dir_output, "argentina-relaciones.jpg"),
+  width = 3000,
+  height = 1500,
+  units = "px",
+  dpi = 300)
+
 
 analizar_pais <- function(pais, data = journal.amlat) {
   library(dplyr)
