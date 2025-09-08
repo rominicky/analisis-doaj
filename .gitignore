@@ -31,7 +31,7 @@ Rakefile
 #/.hypothesis
 #/.pytest_cache
 #/.ropeproject
-#/.env
+/.env
 #/.venv
 #/.virtualenvs
 #/.pylint.d
