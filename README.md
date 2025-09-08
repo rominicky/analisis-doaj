@@ -1,6 +1,7 @@
 # Análisis de revistas latinoamericanas en DOAJ
 ## Diseñado y mantenido por Romina De León (CONICET)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1234567.svg)](https://doi.org/10.5281/zenodo.1234567)
+[![DOI](https://zenodo.org/badge/660713633.svg)](https://doi.org/10.5281/zenodo.17080220)
+![MyBinder](https://mybinder.org/badge_logo.svg)](https://hub.2i2c.mybinder.org/user/rominicky-analisis-doaj-vacrhqwc/lab/tree/assets/script/doaj-analisis.ipynb)
 
 Este repositorio contiene un análisis exploratorio y visual de datos sobre revistas académicas latinoamericanas incluidas en el [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/).El trabajo se basa en la base de datos disponible públicamente desde el DOAJ, procesada con herramientas libres para facilitar su exploración y reutilización.
 
@@ -45,4 +46,4 @@ Cómo citar este repositorio
 
 Si reutilizás este trabajo, por favor citá de la siguiente manera:
 
-    De León, Romina (2025). Análisis de revistas latinoamericanas en DOAJ [Repositorio GitHub]. https://doi.org/10.5281/zenodo.1234567
+    De León, Romina (2025). Análisis de revistas latinoamericanas en DOAJ [Repositorio GitHub]. https://doi.org/10.5281/zenodo.17080220
