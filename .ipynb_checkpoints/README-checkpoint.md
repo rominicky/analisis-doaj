@@ -15,8 +15,8 @@ Este repositorio contiene un análisis exploratorio y visual de datos sobre revi
 .
 ├── datos/ # Archivos CSV utilizados para el análisis
 ├── notebooks/ # Cuadernos Jupyter con el procesamiento y visualización
-    ── scripts/ # Scripts auxiliares para limpieza y transformación de datos
-├── visualizaciones/ # Gráficos exportados en formato PNG/SVG/HTML
+├── visualizaciones/ # Gráficos exportados en formato PNG/SVG
+├── scripts/ # Scripts auxiliares para limpieza y transformación de datos
 ├── README.md # Este archivo
 └── licencia.txt # Términos de uso de los contenidos del repositorio
 
@@ -24,14 +24,14 @@ Este repositorio contiene un análisis exploratorio y visual de datos sobre revi
 
 ## Datos utilizados
 
-Los datos originales se descargan desde la sección [DOAJ Public Data Dump](https://doaj.org/CSV/). Se realizó una limpieza y filtrado para conservar únicamente revistas registradas con país de publicación en América Latina.
+Los datos originales fueron descargados desde la sección [DOAJ Public Data Dump](https://doaj.org/docs/public-data-dump/) en 2024. Se realizó una limpieza y filtrado para conservar únicamente revistas registradas con país de publicación en América Latina.
 
 **Campos principales analizados:**
 
 - `country` (país de la revista)
 - `language` (idioma de publicación)
 - `subject` (área temática)
-- `IDs` (Identificadores persistentes)
+- `apc` (Article Processing Charges: si cobra o no a autores)
 - `publisher` (editorial o institución responsable)
 
 ## Herramientas y tecnologías
@@ -41,8 +41,32 @@ Los datos originales se descargan desde la sección [DOAJ Public Data Dump](http
 - Pandas, Matplotlib, Seaborn
 - LibreOffice / CSVKit para revisión de datos
 
+## Cómo reutilizar este repositorio
+
+1. Clonar o descargar el repositorio:
+   ```bash
+   git clone https://github.com/rominicky/analisis-doaj.git
+2. Instalar dependencias necesarias (si se usan los notebooks).
+
+3. Abrir los notebooks desde JupyterLab o VS Code.
+
+4. Usar, modificar o ampliar los gráficos y tablas disponibles para tus propios fines de investigación.
+
 Cómo citar este repositorio
 
 Si reutilizás este trabajo, por favor citá de la siguiente manera:
 
-    De León, Romina (2025). Análisis de revistas latinoamericanas en DOAJ [Repositorio GitHub]. https://doi.org/10.5281/zenodo.1234567
+    Rominicky (2025). Análisis de revistas latinoamericanas en DOAJ [Repositorio GitHub]. https://doi.org/10.5281/zenodo.1234567
+
+También podés importar la cita desde Zenodo en formatos BibTeX, EndNote o CSL JSON.
+Licencia
+
+Este repositorio se distribuye bajo una licencia abierta (ver archivo licencia.txt), que permite su reutilización siempre que se reconozca la fuente.
+Créditos
+
+Este análisis fue desarrollado por rominicky como parte de un proyecto de investigación sobre acceso abierto en América Latina.
+Enlaces relacionados
+
+    DOAJ - Directory of Open Access Journals
+
+    Repositorio con recursos complementarios
