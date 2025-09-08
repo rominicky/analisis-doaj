@@ -10,7 +10,6 @@ _site/
 /vendor/
 #/assets/scipt/
 *.ipynb_checkpoints
-*.ipynb 
 /.ipynb_checkpoints
 /.virtual-documents
 
