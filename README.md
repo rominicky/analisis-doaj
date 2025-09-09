@@ -4,7 +4,7 @@
 
 [![DOI](https://zenodo.org/badge/660713633.svg)](https://doi.org/10.5281/zenodo.17080220)
 
-[![MyBinder](https://hub.2i2c.mybinder.org/user/rominicky-analisis-doaj-7s1xwa0m/doc/tree/doaj-analisis.ipynb)
+[![MyBinder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/rominicky/analisis-doaj/039a9f09b14d14cd8d3678d525d9dd9256e3c5c8?urlpath=lab%2Ftree%2Fdoaj-analisis.ipynb)
 
 Este repositorio contiene un análisis exploratorio y visual de datos sobre revistas académicas latinoamericanas incluidas en el [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/).El trabajo se basa en la base de datos disponible públicamente desde el DOAJ, procesada con herramientas libres para facilitar su exploración y reutilización.
 
