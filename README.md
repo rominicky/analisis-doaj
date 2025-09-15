@@ -2,9 +2,11 @@
 
 ## Diseñado y mantenido por Romina De León (CONICET)
 
+### Coordinación Gimena del Rio (CONICET)
+
 [![DOI](https://zenodo.org/badge/660713633.svg)](https://doi.org/10.5281/zenodo.17080220)
 
-[![MyBinder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/rominicky/analisis-doaj/039a9f09b14d14cd8d3678d525d9dd9256e3c5c8?urlpath=lab%2Ftree%2Fdoaj-analisis.ipynb)
+[![MyBinder](https://mybinder.org/badge_logo.svg)](https://hub.gesis.mybinder.org/user/rominicky-analisis-doaj-cpiuk32s/doc/tree/doaj-analisis.ipynb&flush_cache=true)
 
 Este repositorio contiene un análisis exploratorio y visual de datos sobre revistas académicas latinoamericanas incluidas en el [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/).El trabajo se basa en la base de datos disponible públicamente desde el DOAJ, procesada con herramientas libres para facilitar su exploración y reutilización.
 
@@ -41,6 +43,7 @@ Los datos originales se descargan desde la sección [DOAJ CSV](https://doaj.org/
 - `subject` (área temática)
 - `IDs` (Identificadores persistentes)
 - `publisher` (editorial o institución responsable)
+- `APC` (Article Processing Charge)
 
 ## Herramientas y tecnologías
 
