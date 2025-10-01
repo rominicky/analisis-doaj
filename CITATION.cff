@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "Si usás este repositorio, por favor citá como se indica a continuación."
+title: "Análisis cualitativo y cuantitivo de la base de datos de DOAJ con R"
+authors:
+  - name: Romina De León
+    orcid: "https://orcid.org/0000-0003-2495-7213"  
+    affiliation: "HDLAB-CONICET"
+    email: "rdeleon@conicet.gov.ar"
+  - name: Gimena del Rio Riande
+    orcid: "https://orcid.org/0000-0002-8997-5415"  
+    affiliation: "HDLAB-CONICET"
+    email: "gdelrio.riande@gmail.com
+date-released: 2025-05-13
+version: "2.0"
+doi: 10.5281/zenodo.1234567  
+url: "https://github.com/rominicky/analisis-doaj"
+repository-code: "https://github.com/rominicky/analisis-doaj"
+license: "CC BY-NC-SA 4.0"  
+keywords:
+  - acceso abierto
+  - DOAJ
+  - revistas científicas
+  - América Latina
+  - visualización de datos
