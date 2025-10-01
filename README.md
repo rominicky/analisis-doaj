@@ -1,8 +1,8 @@
-# Análisis de revistas latinoamericanas en DOAJ
+# Análisis cualitativo y cuantitivo de la base de datos de DOAJ con R
 
-## Diseñado y mantenido por Romina De León (CONICET)
-
-### Coordinación Gimena del Rio (CONICET)
+#### [Romina De León](rdeleon@conicet.gov.ar) y [Gimena del Rio](gdelrio.riande@gmail.com) 
+#### ([HDLAB CONICET](https://hdlab.space/))
+#### Diseñado y mantenido por Romina De León
 
 [![DOI](https://zenodo.org/badge/660713633.svg)](https://doi.org/10.5281/zenodo.17080220)
 
