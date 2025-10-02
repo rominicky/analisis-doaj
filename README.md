@@ -1,20 +1,20 @@
 # Análisis cualitativo y cuantitivo de la base de datos de DOAJ con R
 
-#### [Romina De León](rdeleon@conicet.gov.ar) y [Gimena del Rio](gdelrio.riande@gmail.com) 
-#### ([HDLAB CONICET](https://hdlab.space/))
-#### Diseñado y mantenido por Romina De León
+#### [Romina De León](rdeleon@conicet.gov.ar) y Dra. [Gimena del Rio Riande](gdelrio@conicet.gov.ar), investigadora independiente del IIBICRIT-CONICET y embajadora en América Latina para el Directory of Open Access Journals
+#### Este proyecto es parte de las actividedes del ([HDLAB CONICET](https://hdlab.space/))
+#### Diseñado por Gimena del Rio Riande y Romina De León. Mantenido por Romina De León
 
 [![DOI](https://zenodo.org/badge/660713633.svg)](https://doi.org/10.5281/zenodo.17244368)
 
 [![MyBinder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/rominicky/analisis-doaj/main?urlpath=%2Fdoc%2Ftree%2Fdoaj-analisis.ipynb)
 
-Este repositorio contiene un análisis exploratorio y visual de datos sobre revistas académicas latinoamericanas incluidas en el [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/).El trabajo se basa en la base de datos disponible públicamente desde el DOAJ, procesada con herramientas libres para facilitar su exploración y reutilización.
+Esta notebook ofrece los datos actualizados cosechados automáticamente del base de datos pública de [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/) a través de un análisis exploratorio de revistas de investigación latinoamericanas incluidas en el directorio. Utiliza el lenguaje de programación R para ofrecer el análisis y las visualizaciones en tiempo real.
 
 ## Objetivos
 
 - Explorar la presencia de revistas de América Latina en DOAJ.
 - Analizar su distribución por país, idioma, disciplina, identificadores persistentes y política de acceso.
-- Ofrecer visualizaciones accesibles y reutilizables que apoyen investigaciones bibliométricas, estudios de acceso abierto y políticas científicas regionales.
+- Ofrecer visualizaciones accesibles y reutilizables que apoyen investigaciones sobre publicación científica, acceso abierto, políticas científicas regionales, multilingüismo, etc.
 
 ## Contenido del repositorio
 
@@ -54,4 +54,4 @@ Los datos originales se descargan desde la sección [DOAJ CSV](https://doaj.org/
 
 Si reutilizás este trabajo, por favor citá de la siguiente manera:
 
-    De León, Romina (2025). Análisis de revistas latinoamericanas en DOAJ [Repositorio GitHub]. https://doi.org/10.5281/zenodo.17080220
+    De León, Romina  y Gimena del Rio Riande (2025). Análisis de revistas latinoamericanas en DOAJ [Repositorio GitHub]. https://doi.org/10.5281/zenodo.17080220
