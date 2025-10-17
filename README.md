@@ -1,14 +1,14 @@
 # Análisis cualitativo y cuantitivo de la base de datos de DOAJ con R
 
-#### [Romina De León](rdeleon@conicet.gov.ar) y Dra. [Gimena del Rio Riande](gdelrio@conicet.gov.ar), investigadora independiente del IIBICRIT-CONICET y embajadora en América Latina para el Directory of Open Access Journals
+#### [Romina De León](rdeleon@conicet.gov.ar) y Dra. [Gimena del Rio Riande](gdelrio.riande@conicet.gov.ar), investigadora independiente del IIBICRIT-CONICET y embajadora en América Latina para el Directory of Open Access Journals
 #### Este proyecto es parte de las actividedes del ([HDLAB CONICET](https://hdlab.space/))
-#### Diseñado por Gimena del Rio Riande y Romina De León. Mantenido por Romina De León
+#### Mantenido por Romina De León 
 
 [![DOI](https://zenodo.org/badge/660713633.svg)](https://doi.org/10.5281/zenodo.17244368)
 
 [![MyBinder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/rominicky/analisis-doaj/main?urlpath=%2Fdoc%2Ftree%2Fdoaj-analisis.ipynb)
 
-Esta notebook ofrece los datos actualizados cosechados automáticamente del base de datos pública de [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/) a través de un análisis exploratorio de revistas de investigación latinoamericanas incluidas en el directorio. Utiliza el lenguaje de programación R para ofrecer el análisis y las visualizaciones en tiempo real.
+Este repositorio contiene un análisis exploratorio y visual de datos sobre revistas académicas latinoamericanas incluidas en el [*Directory of Open Access Journals* (DOAJ)](https://doaj.org/). Desarrollado con la base de datos disponible públicamente desde el DOAJ, procesada con lenguaje de programación R que ofrece análisis y visualizaciones en tiempo real, que facilita su exploración y reutilización.
 
 ## Objetivos
 
@@ -30,11 +30,9 @@ Esta notebook ofrece los datos actualizados cosechados automáticamente del base
 
 └── licencia.txt # Términos de uso de los contenidos del repositorio
 
-** Las notebooks y scripts no están publicados, pero los datos de entrada y visualizaciones están disponibles para consulta y citación.**
-
 ## Datos utilizados
 
-Los datos originales se descargan desde la sección [DOAJ CSV](https://doaj.org/CSV/). Se realizó una limpieza y filtrado para conservar únicamente revistas registradas con país de publicación en América Latina.
+Los datos originales se descargan desde la sección [DOAJ CSV](https://doaj.org/CSV/). Se realizaron visualizaciones a nivel mundial, y luego limpieza y filtrado para conservar únicamente revistas registradas en América Latina.
 
 **Campos principales analizados:**
 
@@ -49,8 +47,7 @@ Los datos originales se descargan desde la sección [DOAJ CSV](https://doaj.org/
 
 - Python 3.x
 - Jupyter Notebooks
-- Pandas, Matplotlib, Seaborn
-- LibreOffice / CSVKit para revisión de datos
+- Pandas, Matplotlib, Seaborn 
 
 Si reutilizás este trabajo, por favor citá de la siguiente manera:
 
