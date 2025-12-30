@@ -44,3 +44,11 @@ Rakefile
 #.Rproj.user
 #*.Rproj
 #*.rbc
+
+# --- Quarto & Notebooks ---
+# Ignorar archivos fuente de Quarto
+*.qmd
+
+# Ignorar carpetas de renderizado y caché de Quarto
+/.quarto/
+/_freeze/
