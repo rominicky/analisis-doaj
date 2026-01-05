@@ -7,3 +7,5 @@ libxt-dev
 libssl-dev
 libcurl4-openssl-dev
 libxml2-dev
+libglpk-dev
+libspatialindex-dev
