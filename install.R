@@ -1,9 +1,9 @@
 install.packages(c(
-  "tidyverse", 
-  "tidytext", 
-  "dplyr", 
-  "tidyselect", 
-  "IRkernel"
+  "tidyverse", "RColorBrewer", "paletteer", "datos", "gapminder", "tradestatistics", "highcharter",
+  "treemapify", "ggplot2", "rio", "echarts4r", "plotly", "tidytext", "tidyselect", "dplyr", 
+  "purrr", "readr", "stringr", "webshot", "htmlwidgets", "pandoc", "forcats",
+"cowplot", "ggrepel", "sf", "rnaturalearth", "rnaturalearthhires", "countrycode", "scico", "Cairo",
+"colorspace", "Polychrome", "MetBrewer", "ggsci", "zoo", "ggiraph"  
 ))
 
 # Registrar IRkernel para Jupyter
