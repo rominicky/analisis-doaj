@@ -6,7 +6,7 @@ install.packages(c(
   "readr","stringr","webshot","htmlwidgets","pandoc","forcats",
   "cowplot","ggrepel","sf","rnaturalearth","countrycode",
   "scico","Cairo","colorspace","Polychrome","MetBrewer",
-  "ggsci","zoo","ggiraph"
+  "ggsci","zoo","ggiraph", "htmltools"
 ), dependencies = TRUE, Ncpus = 2)
 
 # paquete NO-CRAN
